@@ -1,0 +1,36 @@
+discord-clone/
+├── Cargo.toml                # Rustプロジェクトの依存関係とメタデータ
+├── src/
+│   ├── main.rs               # エントリーポイント
+│   ├── lib.rs                # クレートのルート、共通モジュールのエントリーポイント
+│   ├── api/
+│   │   ├── mod.rs            # APIモジュールのエントリーポイント
+│   │   ├── auth.rs           # 認証に関するエンドポイント
+│   │   ├── messages.rs       # メッセージに関するエンドポイント
+│   │   ├── channels.rs       # チャンネルに関するエンドポイント
+│   │   └── servers.rs        # サーバー（ギルド）に関するエンドポイント
+│   ├── handlers/
+│   │   ├── mod.rs            # ハンドラモジュールのエントリーポイント
+│   │   ├── websocket.rs      # WebSocket接続のハンドラ
+│   │   ├── http.rs           # HTTPリクエストのハンドラ
+│   ├── models/
+│   │   ├── mod.rs            # データモデルのエントリーポイント
+│   │   ├── user.rs           # ユーザーデータモデル
+│   │   ├── message.rs        # メッセージデータモデル
+│   │   ├── channel.rs        # チャンネルデータモデル
+│   │   └── server.rs         # サーバーデータモデル
+│   ├── services/
+│   │   ├── mod.rs            # サービスモジュールのエントリーポイント
+│   │   ├── auth_service.rs   # 認証のビジネスロジック
+│   │   ├── message_service.rs # メッセージ関連のビジネスロジック
+│   │   ├── channel_service.rs # チャンネル関連のビジネスロジック
+│   │   └── server_service.rs  # サーバー（ギルド）関連のビジネスロジック
+│   ├── utils/
+│   │   ├── mod.rs            # ユーティリティモジュールのエントリーポイント
+│   │   └── token.rs          # JWTトークン生成・検証関連のユーティリティ
+│   └── config/
+│       ├── mod.rs            # 設定モジュールのエントリーポイント
+│       └── config.rs         # アプリケーション設定の定義と読み込み
+└── tests/
+    ├── integration_test.rs   # 統合テスト
+    └── unit_test.rs          # ユニットテスト
