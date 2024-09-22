@@ -1,5 +1,5 @@
 use crate::handlers::server::WsChatServer;
-use crate::models::message::{ChatMessage, JoinServer, ListServer, SendMessage};
+use crate::models::message::{ClientMessage, JoinServer, ListServer, SendMessage, ServerMessage};
 use actix::prelude::*;
 use actix_broker::BrokerIssue;
 use actix_web_actors::ws;
@@ -51,16 +51,16 @@ impl WsChatSession {
             .wait(ctx);
     }
 
-    pub fn send_msg(&self, msg: &str) {
+    pub fn send_msg(&self, msg: ClientMessage) {
         let content = format!(
-            "{}: {msg}",
+            "{}: {}",
             self.name.clone().unwrap_or_else(|| "anon".to_owned()),
+            msg.text
         );
 
         let msg = SendMessage(self.room.clone(), self.id, content);
 
-        // issue_async comes from having the `BrokerIssue` trait in scope.
-        self.issue_system_async(msg); // BrokerIssueトレイトのメソッドを使用
+        self.issue_system_async(msg);
     }
 }
 
@@ -81,14 +81,13 @@ impl Actor for WsChatSession {
     }
 }
 
-impl Handler<ChatMessage> for WsChatSession {
+impl Handler<ServerMessage> for WsChatSession {
     type Result = ();
 
-    fn handle(&mut self, msg: ChatMessage, ctx: &mut Self::Context) {
-        ctx.text(msg.0);
+    fn handle(&mut self, msg: ServerMessage, ctx: &mut Self::Context) {
+        ctx.text(msg.text);
     }
 }
-
 impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for WsChatSession {
     fn handle(&mut self, msg: Result<ws::Message, ws::ProtocolError>, ctx: &mut Self::Context) {
         let msg = match msg {
@@ -105,6 +104,7 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for WsChatSession {
             ws::Message::Text(text) => {
                 let msg = text.trim();
 
+                // コマンドメッセージ
                 if msg.starts_with('/') {
                     let mut command = msg.splitn(2, ' ');
 
@@ -133,7 +133,11 @@ impl StreamHandler<Result<ws::Message, ws::ProtocolError>> for WsChatSession {
 
                     return;
                 }
-                self.send_msg(msg);
+                if let Ok(chat_message) = serde_json::from_str::<ClientMessage>(msg) {
+                    self.send_msg(chat_message);
+                } else {
+                    ctx.text("!!! invalid message format");
+                }
             }
             ws::Message::Close(reason) => {
                 ctx.close(reason);

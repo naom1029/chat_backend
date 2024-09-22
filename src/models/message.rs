@@ -1,13 +1,23 @@
 use actix::prelude::*;
+use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
-#[derive(Clone, Message)]
+#[derive(Clone, Message, Serialize, Deserialize)]
 #[rtype(result = "()")]
-pub struct ChatMessage(pub String);
+pub struct ClientMessage {
+    pub text: String,
+}
+#[derive(Clone, Message, Serialize, Deserialize)]
+#[rtype(result = "()")]
+pub struct ServerMessage {
+    pub id: String,
+    pub text: String,
+    pub timestamp: String,
+}
 
 #[derive(Clone, Message)]
 #[rtype(result = "Uuid")]
-pub struct JoinServer(pub String, pub Option<String>, pub Recipient<ChatMessage>);
+pub struct JoinServer(pub String, pub Option<String>, pub Recipient<ServerMessage>);
 
 #[derive(Clone, Message)]
 #[rtype(result = "()")]
