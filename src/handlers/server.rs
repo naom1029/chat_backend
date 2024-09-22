@@ -76,11 +76,9 @@ impl WsChatServer {
             text: msg.to_owned(),
             timestamp: Utc::now().to_rfc2822(),
         };
-        for (id, client) in clients.drain() {
+        for (id, client) in clients.iter() {
             match client.try_send(message.clone()) {
-                Ok(_) => {
-                    // self.add_client_to_server(server_name, Some(id), client);
-                }
+                Ok(_) => {}
                 Err(e) => {
                     eprintln!("Failed to send message to client {}: {}", id, e);
                 }
