@@ -17,11 +17,11 @@ impl WsChatSession {
         let server_name = server_name.to_owned();
 
         // Then send a join message for the new room
-        let join_msg = JoinServer(
-            server_name.to_owned(),
-            self.name.clone(),
-            ctx.address().recipient(),
-        );
+        let join_msg = JoinServer {
+            server_name: server_name.to_owned(),
+            client_name: self.name.clone(),
+            client: ctx.address().recipient(),
+        };
         WsChatServer::from_registry()
             .send(join_msg)
             .into_actor(self)

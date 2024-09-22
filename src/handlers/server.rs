@@ -115,14 +115,15 @@ impl Handler<JoinServer> for WsChatServer {
     type Result = MessageResult<JoinServer>;
 
     fn handle(&mut self, msg: JoinServer, _ctx: &mut Self::Context) -> Self::Result {
-        let JoinServer(server_name, client_name, client) = msg;
+        // let JoinServer(server_name, client_name, client) = msg;
 
-        let id = self.add_client_to_server(&server_name, None, client.clone());
+        let id = self.add_client_to_server(&msg.server_name, None, msg.client.clone());
         let join_msg = format!(
-            "{} joined {server_name}",
-            client_name.unwrap_or_else(|| "anon".to_owned()),
+            "{} joined {}",
+            msg.client_name.unwrap_or_else(|| "anon".to_owned()),
+            msg.server_name,
         );
-        self.send_system_message(&server_name, &join_msg, client);
+        self.send_system_message(&msg.server_name, &join_msg, msg.client);
         MessageResult(id)
     }
 }

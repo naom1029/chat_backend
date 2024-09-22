@@ -21,8 +21,11 @@ pub struct SystemMessage {
 }
 #[derive(Clone, Message)]
 #[rtype(result = "Uuid")]
-pub struct JoinServer(pub String, pub Option<String>, pub Recipient<ServerMessage>);
-
+pub struct JoinServer {
+    pub server_name: String,
+    pub client_name: Option<String>,
+    pub client: Recipient<ServerMessage>,
+}
 #[derive(Clone, Message)]
 #[rtype(result = "()")]
 pub struct LeaveServer(pub String, pub Uuid);
