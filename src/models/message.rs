@@ -14,7 +14,11 @@ pub struct ServerMessage {
     pub text: String,
     pub timestamp: String,
 }
-
+#[derive(Clone, Message, Serialize, Deserialize)]
+#[rtype(result = "()")]
+pub struct SystemMessage {
+    pub text: String,
+}
 #[derive(Clone, Message)]
 #[rtype(result = "Uuid")]
 pub struct JoinServer(pub String, pub Option<String>, pub Recipient<ServerMessage>);

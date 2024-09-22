@@ -86,6 +86,20 @@ impl WsChatServer {
         }
         Some(())
     }
+    fn send_system_message(&mut self, server_name: &str, msg: &str, client: Client) -> Option<()> {
+        let message = ServerMessage {
+            id: Uuid::new_v4().to_string(),
+            text: msg.to_owned(),
+            timestamp: Utc::now().to_rfc2822(),
+        };
+        match client.try_send(message.clone()) {
+            Ok(_) => {}
+            Err(e) => {
+                eprintln!("Failed to send message to client: {}", e);
+            }
+        }
+        Some(())
+    }
 }
 
 impl Actor for WsChatServer {
@@ -103,13 +117,12 @@ impl Handler<JoinServer> for WsChatServer {
     fn handle(&mut self, msg: JoinServer, _ctx: &mut Self::Context) -> Self::Result {
         let JoinServer(server_name, client_name, client) = msg;
 
-        let id = self.add_client_to_server(&server_name, None, client);
+        let id = self.add_client_to_server(&server_name, None, client.clone());
         let join_msg = format!(
             "{} joined {server_name}",
             client_name.unwrap_or_else(|| "anon".to_owned()),
         );
-
-        self.send_chat_message(&server_name, &join_msg, id);
+        self.send_system_message(&server_name, &join_msg, client);
         MessageResult(id)
     }
 }
