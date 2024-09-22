@@ -28,7 +28,10 @@ pub struct JoinServer {
 }
 #[derive(Clone, Message)]
 #[rtype(result = "()")]
-pub struct LeaveServer(pub String, pub Uuid);
+pub struct LeaveServer {
+    pub server_name: String,
+    pub client_id: Uuid,
+}
 #[derive(Clone, Message)]
 #[rtype(result = "Vec<String>")]
 pub struct ListServer;

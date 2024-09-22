@@ -132,8 +132,8 @@ impl Handler<LeaveServer> for WsChatServer {
     type Result = ();
 
     fn handle(&mut self, msg: LeaveServer, _ctx: &mut Self::Context) {
-        if let Some(server) = self.server_client_connections.get_mut(&msg.0) {
-            server.remove(&msg.1);
+        if let Some(server) = self.server_client_connections.get_mut(&msg.server_name) {
+            server.remove(&msg.client_id);
         }
     }
 }
