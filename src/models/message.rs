@@ -26,16 +26,16 @@ pub struct JoinServer {
     pub client_name: Option<String>,
     pub client: Recipient<ServerMessage>,
 }
-#[derive(Clone, Message)]
+#[derive(Clone, Message, Serialize, Deserialize)]
 #[rtype(result = "()")]
 pub struct LeaveServer {
     pub server_name: String,
     pub client_id: Uuid,
 }
-#[derive(Clone, Message)]
+#[derive(Clone, Message, Serialize, Deserialize)]
 #[rtype(result = "Vec<String>")]
 pub struct ListServer;
 
-#[derive(Clone, Message)]
+#[derive(Clone, Message, Serialize, Deserialize)]
 #[rtype(result = "()")]
 pub struct SendMessage(pub String, pub Uuid, pub String);
