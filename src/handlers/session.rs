@@ -1,5 +1,5 @@
 use crate::handlers::server::WsChatServer;
-use crate::models::message::{ClientMessage, JoinServer, ListServer, SendMessage, ServerMessage};
+use crate::models::message::{ChatMessage, ClientMessage, JoinServer, ListServer, SendMessage};
 use actix::prelude::*;
 use actix_broker::BrokerIssue;
 use actix_web_actors::ws;
@@ -68,7 +68,7 @@ impl Actor for WsChatSession {
     type Context = ws::WebsocketContext<Self>;
 
     fn started(&mut self, ctx: &mut Self::Context) {
-        // self.join_server("main", ctx);
+        self.join_server("Server1", ctx);
     }
 
     fn stopped(&mut self, _ctx: &mut Self::Context) {
@@ -81,10 +81,10 @@ impl Actor for WsChatSession {
     }
 }
 
-impl Handler<ServerMessage> for WsChatSession {
+impl Handler<ChatMessage> for WsChatSession {
     type Result = ();
 
-    fn handle(&mut self, msg: ServerMessage, ctx: &mut Self::Context) {
+    fn handle(&mut self, msg: ChatMessage, ctx: &mut Self::Context) {
         ctx.text(msg.text);
     }
 }

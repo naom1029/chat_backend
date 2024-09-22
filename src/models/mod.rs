@@ -3,4 +3,4 @@ pub mod message;
 pub mod server;
 pub mod user;
 
-pub use message::{ClientMessage, JoinServer, LeaveServer, ListServer, SendMessage, ServerMessage};
+pub use message::{ChatMessage, ClientMessage, JoinServer, LeaveServer, ListServer, SendMessage};

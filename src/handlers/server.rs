@@ -1,7 +1,5 @@
 use crate::models::user::User;
-use crate::models::{
-    ClientMessage, JoinServer, LeaveServer, ListServer, SendMessage, ServerMessage,
-};
+use crate::models::{ChatMessage, ClientMessage, JoinServer, LeaveServer, ListServer, SendMessage};
 use actix::prelude::*;
 use actix_broker::BrokerSubscribe;
 use actix_web::dev::Server;
@@ -26,7 +24,7 @@ type Users = Arc<RwLock<HashMap<Uuid, HashMap<usize, (User, Addr<WsChatServer>)>
 // 接続IDを生成するためのカウンター
 static NEXT_CONN_ID: AtomicUsize = AtomicUsize::new(1);
 
-type Client = Recipient<ServerMessage>; // 送信先
+type Client = Recipient<ChatMessage>; // 送信先
 type ClientConnections = HashMap<Uuid, Client>; // クライアントリスト
 #[derive(Default)]
 pub struct WsChatServer {
@@ -71,7 +69,7 @@ impl WsChatServer {
     }
     fn send_chat_message(&mut self, server_name: &str, msg: &str, _src: Uuid) -> Option<()> {
         let clients = self.server_client_connections.get_mut(server_name)?;
-        let message = ServerMessage {
+        let message = ChatMessage {
             id: Uuid::new_v4().to_string(),
             text: msg.to_owned(),
             timestamp: Utc::now().to_rfc2822(),
@@ -87,7 +85,7 @@ impl WsChatServer {
         Some(())
     }
     fn send_system_message(&mut self, server_name: &str, msg: &str, client: Client) -> Option<()> {
-        let message = ServerMessage {
+        let message = ChatMessage {
             id: Uuid::new_v4().to_string(),
             text: msg.to_owned(),
             timestamp: Utc::now().to_rfc2822(),

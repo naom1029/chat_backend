@@ -9,7 +9,7 @@ pub struct ClientMessage {
 }
 #[derive(Clone, Message, Serialize, Deserialize)]
 #[rtype(result = "()")]
-pub struct ServerMessage {
+pub struct ChatMessage {
     pub id: String,
     pub text: String,
     pub timestamp: String,
@@ -24,7 +24,7 @@ pub struct SystemMessage {
 pub struct JoinServer {
     pub server_name: String,
     pub client_name: Option<String>,
-    pub client: Recipient<ServerMessage>,
+    pub client: Recipient<ChatMessage>,
 }
 #[derive(Clone, Message, Serialize, Deserialize)]
 #[rtype(result = "()")]
