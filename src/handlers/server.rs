@@ -106,6 +106,11 @@ impl Actor for WsChatServer {
     type Context = Context<Self>;
 
     fn started(&mut self, ctx: &mut Self::Context) {
+        let initial_servers = vec!["Server1", "Server2", "Server3", "Server4"];
+        self.server_client_connections = initial_servers
+            .into_iter()
+            .map(|name| (name.to_string(), ClientConnections::new()))
+            .collect();
         self.subscribe_system_async::<LeaveServer>(ctx);
         self.subscribe_system_async::<SendMessage>(ctx);
     }
@@ -115,8 +120,6 @@ impl Handler<JoinServer> for WsChatServer {
     type Result = MessageResult<JoinServer>;
 
     fn handle(&mut self, msg: JoinServer, _ctx: &mut Self::Context) -> Self::Result {
-        // let JoinServer(server_name, client_name, client) = msg;
-
         let id = self.add_client_to_server(&msg.server_name, None, msg.client.clone());
         let join_msg = format!(
             "{} joined {}",

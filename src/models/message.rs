@@ -36,6 +36,11 @@ pub struct LeaveServer {
 #[rtype(result = "Vec<String>")]
 pub struct ListServer;
 
+pub struct SelectServer {
+    pub server_name: String,
+    pub client_id: Uuid,
+}
+
 #[derive(Clone, Message, Serialize, Deserialize)]
 #[rtype(result = "()")]
 pub struct SendMessage(pub String, pub Uuid, pub String);
