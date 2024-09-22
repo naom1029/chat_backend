@@ -70,7 +70,7 @@ impl WsChatServer {
         id
     }
     fn send_chat_message(&mut self, server_name: &str, msg: &str, _src: Uuid) -> Option<()> {
-        let mut clients: ClientConnections = self.take_server(server_name)?;
+        let clients = self.server_client_connections.get_mut(server_name)?;
         let message = ServerMessage {
             id: Uuid::new_v4().to_string(),
             text: msg.to_owned(),
