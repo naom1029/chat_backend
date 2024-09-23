@@ -1,12 +1,26 @@
 use actix::prelude::*;
+use actix_web::dev::Server;
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
-// クライアントから送信され送信されるメっセージ
+// クライアントから送信されるメッセージ
 #[derive(Clone, Message, Serialize, Deserialize)]
 #[rtype(result = "()")]
-pub struct ClientMessage {
+#[serde(tag = "type")]
+pub enum ClientMessage {
+    Command(CommandMessage),
+    Chat(ClientChatMessage),
+}
+
+#[derive(Clone, Message, Serialize, Deserialize)]
+#[rtype(result = "()")]
+pub struct ClientChatMessage {
     pub text: String,
+}
+#[derive(Clone, Serialize, Deserialize, Debug)]
+pub struct CommandMessage {
+    pub command: String,
+    pub args: Option<String>, // コマンドに引数がある場合
 }
 
 // チャットメッセージ
@@ -24,6 +38,12 @@ pub struct ChatMessage {
 pub struct SystemMessage {
     pub text: String,
 }
+#[derive(Clone, Message, Serialize, Deserialize)]
+#[rtype(result = "()")]
+pub enum ServerMessage {
+    Chat(ChatMessage),
+    System(SystemMessage),
+}
 
 // サーバーに参加するためのメッセージ
 #[derive(Clone, Message)]
@@ -31,7 +51,7 @@ pub struct SystemMessage {
 pub struct JoinServer {
     pub server_name: String,
     pub client_name: Option<String>,
-    pub client: Recipient<ChatMessage>,
+    pub client: Recipient<ServerMessage>,
 }
 
 // サーバーから退出するためのメッセージ
