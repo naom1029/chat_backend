@@ -6,6 +6,7 @@ use actix::prelude::*;
 use actix_broker::BrokerIssue;
 use actix_web_actors::ws;
 use log::error;
+use serde::Serialize;
 use uuid::Uuid;
 
 #[derive(Default)]
@@ -44,8 +45,16 @@ impl WsChatSession {
             .into_actor(self)
             .then(|res, _, ctx| {
                 if let Ok(rooms) = res {
-                    for room in rooms {
-                        ctx.text(room);
+                    let server_message = ServerMessage::List { rooms };
+
+                    match serde_json::to_string(&server_message) {
+                        Ok(json) => {
+                            ctx.text(json);
+                        }
+                        Err(e) => {
+                            // エラーが発生した場合のログ
+                            eprintln!("Failed to serialize rooms to JSON: {}", e);
+                        }
                     }
                 }
 
@@ -112,16 +121,10 @@ impl Handler<ServerMessage> for WsChatSession {
     type Result = ();
 
     fn handle(&mut self, msg: ServerMessage, ctx: &mut Self::Context) {
-        let json_str = match msg {
-            ServerMessage::Chat(chat_msg) => serde_json::to_string(&chat_msg).unwrap_or_else(|e| {
-                eprintln!("ChatMessage のシリアル化に失敗しました: {}", e);
-                "{}".to_owned()
-            }),
-            ServerMessage::System(sys_msg) => serde_json::to_string(&sys_msg).unwrap_or_else(|e| {
-                eprintln!("SystemMessage のシリアル化に失敗しました: {}", e);
-                "{}".to_owned()
-            }),
-        };
+        let json_str = serde_json::to_string(&msg).unwrap_or_else(|e| {
+            eprintln!("ServerMessage のシリアル化に失敗しました: {}", e);
+            "{}".to_owned()
+        });
         ctx.text(json_str);
     }
 }

@@ -40,9 +40,11 @@ pub struct SystemMessage {
 }
 #[derive(Clone, Message, Serialize, Deserialize)]
 #[rtype(result = "()")]
+#[serde(tag = "type")]
 pub enum ServerMessage {
     Chat(ChatMessage),
     System(SystemMessage),
+    List { rooms: Vec<String> },
 }
 
 // サーバーに参加するためのメッセージ
